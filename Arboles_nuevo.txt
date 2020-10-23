@@ -1,6 +1,4 @@
-Cocotero+233+3.780000
 Sauce lloron+310+5.110000
-Falsa Acacia+20+1.150000
-Laurel+210+2.550000
+Laurel+3+3.000000
 Secuoya Caucho+150+1.990000
 Gikgo biloba+90+1.880000

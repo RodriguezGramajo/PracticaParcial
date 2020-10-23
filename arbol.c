@@ -13,51 +13,35 @@ struct Arboles
     float altura;
 };
 
-void ejecucionPrograma()
+int contarLineasStruct(Arbol a[])
 {
-	Arbol a[MAX];
-	int lineas = 0;
-	
-	for (int i = 0; i<MAX; i++)
-	{
-		a[i]=nuevoArbol();
+	int flag, i = 0;
+	while(flag != 1)
+	{	
+		i++;
+		if (a[i]->edad == -1)
+		{
+			flag = 1;
+		}
+				
 	}
-	
-	arbolArchivo(a, "Arboles.txt"); //Abro el archivo original y paso los datos a la estructura.
-	
-	lineas = contarLineas("Arboles.txt");	
-	FILE *archNuevo;
-	archNuevo = fopen("Arboles_nuevo.txt", "w");	
-	for (int i = 0; i<lineas; i++)
+	return i;	
+}
+void inicializarArbol(Arbol a[])
+{
+	for(int i = 0; i<MAX; i++)
 	{
-		agregarArrayArbol(a[i]);
-	}	
-	fclose(archNuevo);	//Crea un nuevo archivo con los datos originales
-		
-	agregarArbol("Laurel", 210, 2.55);
-	agregarArbol("Secuoya Caucho", 150, 1.99);
-	agregarArbol("Gikgo biloba", 90, 1.88); //Agrego por parametro los arboles pedidos
-		
-	arbolArchivo(a, "Arboles_nuevo.txt");	
-	lineas = contarLineas("Arboles_nuevo.txt");
-	
-	for (int i = 0; i<lineas-1; i++)
-	{
-		mostrarArbol(a[i]);
+		strcpy(a[i]->especie,"-1");
+		setEdad(a, i, "-1");
+		setAltura(a, i, "-1");
 	}
-	
-	
-	for (int i = 0; i<MAX; i++)
-	{
-		destruirArbol(a[i]);
-	}	
 }
 
 void arbolArchivo(Arbol a[], char *nombreArchivo)
 {
 	FILE *arch;
 	arch = fopen(nombreArchivo, "r");	
-	char buff[MAX] = " ";
+	char buff[MAX];
 	int i = 0;
 	
 	if(arch == NULL)
@@ -66,9 +50,8 @@ void arbolArchivo(Arbol a[], char *nombreArchivo)
 	}
 	else
 	{
-		while (!feof(arch))
+		while (fgets(buff, MAX, arch))
 		{
-			fgets(buff, MAX, arch);
 			a[i] = 	archToArbol(buff, MAX);
 			i++;										
 		}
@@ -89,6 +72,19 @@ void agregarArrayArbol(Arbol a)
 	FILE *arch;
 	arch = fopen("Arboles_nuevo.txt", "a");
 	fprintf(arch, "%s+%d+%f\n", a->especie, a->edad, a->altura);
+	fclose(arch);
+}
+
+void ArbolToTxt(Arbol a[], int t)
+{
+	FILE *arch;
+	arch = fopen("Arboles_nuevo.txt", "w+");
+	
+	for (int i = 0; i<t; i++)
+	{
+		fprintf(arch, "%s+%d+%f\n", a[i]->especie, a[i]->edad, a[i]->altura);
+	}
+	
 	fclose(arch);
 }
 
@@ -130,10 +126,86 @@ Arbol archToArbol(char c[], int t)
     return a;
 }
 
+int posicionBusqueda(char busqueda[], Arbol a[], int t)
+{
+	int posicionBuscado = -1;
+	for(int i = 0; i<t; i++)
+	{
+		if(strcmp(busqueda, a[i]->especie) == 0)
+		{
+			posicionBuscado = i;
+		}		
+	}
+	return posicionBuscado;
+}
+
+void modificarArbol(char nombreEspecie[], Arbol a[], int t)
+{
+	system("CLS");
+	printf("Modificar %s:", nombreEspecie);
+	
+	int posicionBuscado = -1;
+	int edadOriginal = 0;
+	float alturaOriginal = 0;
+	char nuevaEdad[MAX], nuevaAltura[MAX];
+	
+	posicionBuscado = posicionBusqueda(nombreEspecie, a, t);
+
+	edadOriginal = getEdad(a, posicionBuscado);
+	alturaOriginal = getAltura(a, posicionBuscado);
+	printf("Datos originales: EDAD %d ALTURA %.2f\n", edadOriginal, alturaOriginal);
+	
+	printf("Nueva Edad: ");
+	fflush(stdin);
+	gets(nuevaEdad);
+	setEdad(a, posicionBuscado, nuevaEdad);	
+	
+	printf("Nueva Altura: ");
+	fflush(stdin);
+	gets(nuevaAltura);
+	setAltura(a, posicionBuscado, nuevaAltura);
+	
+	mostrarArbol(a[posicionBuscado]);
+		
+}
+
+void eliminarArbol(char nombreEspecie[], Arbol a[], int t)
+{	
+	int posicionBuscado = -1;
+	posicionBuscado = posicionBusqueda(nombreEspecie, a, t);
+	
+	for(int i = posicionBuscado; i<=t; i++)
+	{
+		a[i] = a[i+1];
+	}			
+}
+
+float getAltura(Arbol a[], int pos)
+{
+	return a[pos]->altura;
+}
+int getEdad(Arbol a[], int pos)
+{
+	return a[pos]->edad;
+}
+void setAltura(Arbol a[], int pos, char nuevaAlt[])
+{
+	float altura = 0;
+	altura = atof(nuevaAlt);	
+	a[pos]->altura = altura;
+}
+void setEdad(Arbol a[], int pos, char nuevaEdad[])
+{
+	int edad = 0;
+	edad = atoi(nuevaEdad);	
+	a[pos]->edad = edad;
+}
+
 void mostrarArbol(Arbol a)
 {
-	printf("\nEspecie: %s, Edad: %d, Altura: %.2f\n", a->especie, a->edad, a->altura);
+	printf("Especie: %s, Edad: %d, Altura: %.2f\n", a->especie, a->edad, a->altura);	
 }
+
 
 
 Arbol nuevoArbol(){

@@ -4,4 +4,6 @@
 int busquedaSecuencial (int o,char v[], char c, int t);
 
 int contarLineas(char *nombreArchivo); 
+
+
 #endif
